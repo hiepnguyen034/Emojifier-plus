@@ -8,9 +8,12 @@ import torch.nn.functional as F
 
 X_train, Y_train = read_csv('data/train_emoji.csv')
 X_test, Y_test = read_csv('data/tesss.csv')
-maxLen = len(max(X_train, key=len).split())
+#maxLen = len(max(X_train, key=len).split())
+maxLen=32
 
 Y_train = torch.LongTensor(Y_train)
+
+
 
 class Emojifier(nn.Module):
     def __init__(self,input_dim, emb_matrix,layer_dim, hidden_dim=128,output_dim=5,drp=0.5):
@@ -30,11 +33,11 @@ class Emojifier(nn.Module):
         h0 = torch.zeros(self.layer_dim, x.size(0), self.hidden_dim,device='cuda').requires_grad_()
         c0 = torch.zeros(self.layer_dim, x.size(0), self.hidden_dim,device='cuda').requires_grad_()
         x   =   self.embedding(x)
-        out, (hn, cn) = self.lstm(x, (h0.detach(), c0.detach()))
-        out = self.fc(out[:, -1, :]) 
+        out, (hn, cn) = self.lstm(x, (h0.detach(), c0.detach())) #out is of shape (batch_size,time_step,hidden_dim)
+        out = self.fc(out[:, -1, :]) #get output from the last timestep
         return out
 
-
+      
 def train_model(batch_size=32, learning_rate=0.1, epoches=700):
 	torch.cuda.current_device()
 	for i in range(2):  # give cuda more time to load (brute force way to fix CUDA 9 and RTX conflicts)
@@ -78,4 +81,5 @@ def train_model(batch_size=32, learning_rate=0.1, epoches=700):
 
 
 if __name__ == '__main__':
-    train_model()
+	print(maxLen)
+	train_model()

@@ -8,6 +8,7 @@ import torch.nn.functional as F
 from model import Emojifier
 
 import warnings
+
 warnings.filterwarnings("ignore")
 X_train, Y_train = read_csv('data/train_emoji.csv')
 
@@ -31,17 +32,16 @@ def predict():
 	sentence=sentences_to_indices(sentence,word_to_index,maxLen)
 	sentence=sentence.astype(int)
 	sentence=torch.LongTensor(sentence).to(device)
-	for i in range(2):  # give cuda more time to load (brute force way to fix CUDA 9 and RTX conflicts)
-		try:
-			model = Emojifier(emb_matrix.shape[1], emb_matrix, 2).to(device)
-		except RuntimeError as e:
-			pass
-	out=model(sentence)
-	result = label_to_emoji(int(torch.argmax(out)))
-	print(result)
-	
-if __name__ == '__main__':
-
 	model = load_checkpoint('lstm_checkpoint.pth')
 	print('model loaded!!')
+	for i in range(2):  # give cuda more time to load (brute force way to fix CUDA 9 and RTX conflicts)
+		try:
+			out=model(sentence)
+		except RuntimeError as e:
+			pass
+	result = label_to_emoji(int(torch.argmax(out)))
+	print('emoji: ',result)
+	
+if __name__ == '__main__':
 	predict()
+

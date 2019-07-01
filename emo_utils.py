@@ -66,9 +66,11 @@ def convert_to_one_hot(Y, C):
 
 
 emoji_dictionary = {"0": "\u2764\uFE0F",    # :heart: prints a black instead of red heart depending on the font
-                    "1": ":baseball:",
+                    "1": ":frowning:",
                     "2": ":smile:",
                     "3": ":disappointed:",
+                    "5:":":angry:",
+                    "6" :":open_mouth:",
                     "4": ":fork_and_knife:"}
 
 def label_to_emoji(label):
@@ -159,7 +161,10 @@ def sentences_to_indices(X, word_to_index, max_len):
         sentence_words = X[i].lower().split()
         j = 0
         for w in sentence_words:
-            X_indices[i, j] = word_to_index[w]
+            if w not in word_to_index.keys(): #mapping OOV word to zeroes
+                X_indices[i,j]=0
+            else:
+                X_indices[i, j] = word_to_index[w]
 
             j = j+1
     
